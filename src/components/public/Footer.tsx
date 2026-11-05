@@ -1,5 +1,4 @@
-import { ArrowUp, LayoutDashboard } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowUp } from "lucide-react";
 import { useSite } from "../../context/SiteContext";
 import { Logo } from "../Logo";
 import { SocialIcon } from "../Icons";
@@ -59,9 +58,6 @@ export function Footer() {
                 Lainnya
               </div>
               <div className="grid gap-1.5 text-[0.8rem] font-semibold">
-                <Link to="/admin" className="inline-flex items-center gap-1.5 hover:text-[var(--accent)]">
-                  <LayoutDashboard size={12} /> Dashboard
-                </Link>
                 {profile.email && (
                   <a href={`mailto:${profile.email}`} className="hover:text-[var(--accent)]">
                     Email

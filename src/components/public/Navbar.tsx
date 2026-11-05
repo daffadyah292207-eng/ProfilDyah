@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowUpRight, LayoutDashboard, Menu, Moon, Sun, X } from "lucide-react";
+import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import { useSite } from "../../context/SiteContext";
 import { Logo } from "../Logo";
 import { cn } from "../../lib/utils";
@@ -71,14 +70,6 @@ export function Navbar() {
             >
               {mode === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-            <Link
-              to="/admin"
-              className="icon-btn desktop-only"
-              title="Dashboard admin"
-              aria-label="Buka dashboard admin"
-            >
-              <LayoutDashboard size={16} />
-            </Link>
             <a href="#kontak" className="btn btn-primary btn-sm desktop-only">
               {settings.cta_secondary || "Mari terhubung"}
               <ArrowUpRight size={14} />
@@ -103,9 +94,6 @@ export function Navbar() {
               {link.label}
             </a>
           ))}
-          <Link to="/admin" onClick={() => setOpen(false)} className="flex items-center gap-2">
-            <LayoutDashboard size={15} /> Dashboard admin
-          </Link>
           <a
             href="#kontak"
             onClick={() => setOpen(false)}
