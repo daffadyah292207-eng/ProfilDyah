@@ -14,7 +14,7 @@ GitHub Pages.
 - Bagian: Tentang, Keahlian, Perjalanan (pendidikan/pengalaman/organisasi), Proyek, Sertifikasi,
   Kontak, dan footer.
 - Dashboard `/admin`:
-  - Login/daftar via Supabase Auth.
+  - Login saja via Supabase Auth (pendaftaran akun ditutup).
   - Klaim admin otomatis untuk akun pertama.
   - Edit profil, foto, CV, statistik, dan fokus.
   - CRUD keahlian dengan level, kategori, ikon, dan urutan.
@@ -26,7 +26,9 @@ GitHub Pages.
   - Setup database dan seed konten contoh langsung dari dashboard.
 - Formulir kontak menyimpan pesan ke tabel `messages`.
 - RLS Supabase: publik hanya bisa membaca konten dan mengirim pesan; hanya admin yang bisa menulis.
-- Gambar diunggah sebagai data URL terkompresi (tanpa perlu Supabase Storage).
+- Gambar diunggah sebagai data URL terkompresi (tanpa perlu Supabase Storage). Foto baru hanya
+  ditulis ke database setelah **Simpan perubahan** ditekan; nilai lama otomatis tertimpa. Jika
+  suatu saat memakai Supabase Storage, objek lama ikut dihapus setelah penyimpanan berhasil.
 
 ## Menjalankan lokal
 

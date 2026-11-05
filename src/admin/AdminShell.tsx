@@ -22,6 +22,7 @@ import {
 import { Link } from "react-router-dom";
 import { useSite } from "../context/SiteContext";
 import { supabase } from "../lib/supabase";
+import { useAdminDirtyState } from "./AdminContext";
 import { Logo } from "../components/Logo";
 import { Overview } from "./tabs/Overview";
 import { ProfileTab } from "./tabs/ProfileTab";
@@ -105,6 +106,7 @@ export function AdminShell({ email, onSignOut }: { email: string; onSignOut: () 
   const [active, setActive] = useState<AdminTab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unread, setUnread] = useState(0);
+  const hasUnsaved = useAdminDirtyState();
 
   const loadUnread = useCallback(async () => {
     const { count } = await supabase
@@ -125,7 +127,16 @@ export function AdminShell({ email, onSignOut }: { email: string; onSignOut: () 
 
   const meta = titles[active];
 
+  function confirmDiscard(action: string) {
+    if (!hasUnsaved) return true;
+    return window.confirm(
+      `Ada perubahan yang belum disimpan. ${action} akan membuang perubahan tersebut. Lanjutkan?`,
+    );
+  }
+
   function navigate(tab: AdminTab) {
+    if (tab === active) return;
+    if (!confirmDiscard("Berpindah halaman")) return;
     setActive(tab);
   }
 
@@ -150,6 +161,14 @@ export function AdminShell({ email, onSignOut }: { email: string; onSignOut: () 
           <span className="ml-auto rounded-full border border-[var(--line)] px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-[0.1em] text-[var(--muted)]">
             Admin
           </span>
+          <button
+            type="button"
+            className="admin-icon-btn admin-sidebar-close"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Tutup menu"
+          >
+            <X size={15} />
+          </button>
         </div>
 
         <nav className="admin-nav" aria-label="Menu dashboard">
@@ -177,10 +196,22 @@ export function AdminShell({ email, onSignOut }: { email: string; onSignOut: () 
             Masuk sebagai
             <div className="truncate text-[0.68rem] font-semibold text-[var(--ink)]">{email}</div>
           </div>
-          <Link to="/" className="admin-link">
+          <Link
+            to="/"
+            className="admin-link"
+            onClick={(event) => {
+              if (!confirmDiscard("Membuka situs")) event.preventDefault();
+            }}
+          >
             <ExternalLink size={14} /> Lihat situs
           </Link>
-          <button type="button" className="admin-link" onClick={onSignOut}>
+          <button
+            type="button"
+            className="admin-link"
+            onClick={() => {
+              if (confirmDiscard("Keluar dari dashboard")) onSignOut();
+            }}
+          >
             <LogOut size={14} /> Keluar
           </button>
         </div>
@@ -220,7 +251,13 @@ export function AdminShell({ email, onSignOut }: { email: string; onSignOut: () 
             >
               Muat ulang
             </button>
-            <Link to="/" className="admin-btn admin-btn-sm admin-btn-primary">
+            <Link
+              to="/"
+              className="admin-btn admin-btn-sm admin-btn-primary"
+              onClick={(event) => {
+                if (!confirmDiscard("Membuka situs")) event.preventDefault();
+              }}
+            >
               <ExternalLink size={13} /> Lihat situs
             </Link>
           </div>
@@ -246,16 +283,6 @@ export function AdminShell({ email, onSignOut }: { email: string; onSignOut: () 
         {active === "messages" && <MessagesTab onUnreadChange={loadUnread} />}
         {active === "setup" && <SetupTab />}
       </main>
-
-      <button
-        type="button"
-        className="fixed bottom-4 left-4 z-20 admin-icon-btn lg:hidden"
-        onClick={() => setSidebarOpen(false)}
-        aria-label="Tutup menu"
-        hidden={!sidebarOpen}
-      >
-        <X size={16} />
-      </button>
     </div>
   );
 }

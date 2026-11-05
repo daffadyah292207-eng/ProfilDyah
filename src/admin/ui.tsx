@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ImagePlus, Link2, Loader2, Trash2, Upload, ArrowDown, ArrowUp, Eye, EyeOff } from "lucide-react";
 import { dataUrlSize, fileToDataUrl, formatBytes } from "../lib/images";
+import { useAdminDirty } from "./AdminContext";
 import { cn } from "../lib/utils";
 
 export function Field({
@@ -144,6 +145,7 @@ export function ImagePicker({
   hint = "JPG, PNG, atau WebP. Gambar akan dikompres otomatis.",
   maxWidth = 1200,
   previewClass = "h-36",
+  savedValue,
 }: {
   value: string;
   onChange: (value: string) => void;
@@ -151,10 +153,14 @@ export function ImagePicker({
   hint?: string;
   maxWidth?: number;
   previewClass?: string;
+  /** Nilai yang sudah tersimpan di database. Dipakai untuk menandai pratinjau yang belum disimpan. */
+  savedValue?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const persisted = savedValue ?? value;
+  const changed = value !== persisted;
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -174,10 +180,11 @@ export function ImagePicker({
   return (
     <div className="admin-field is-full">
       <span className="admin-label">{label}</span>
-      <div className="rounded-[0.7rem] border border-[var(--line)] bg-[var(--bg)] p-2.5">
+      <div className="admin-image-picker">
         <div
           className={cn(
-            "relative grid place-items-center overflow-hidden rounded-[0.55rem] border border-dashed border-[var(--line-strong)] bg-[var(--surface)]",
+            "admin-image-preview relative grid place-items-center overflow-hidden rounded-[0.55rem] border border-dashed bg-[var(--surface)]",
+            changed ? "border-[var(--accent)]" : "border-[var(--line-strong)]",
             previewClass,
           )}
         >
@@ -189,6 +196,13 @@ export function ImagePicker({
               <span className="text-[0.66rem] font-semibold">Belum ada gambar</span>
             </div>
           )}
+
+          {changed && (
+            <span className="admin-image-badge">
+              {value ? "Pratinjau baru · belum disimpan" : "Akan dihapus saat disimpan"}
+            </span>
+          )}
+
           {busy && (
             <span className="absolute inset-0 grid place-items-center bg-[var(--surface)]/75">
               <Loader2 size={18} className="animate-spin text-[var(--accent)]" />
@@ -211,7 +225,16 @@ export function ImagePicker({
               className="admin-btn admin-btn-sm admin-btn-danger"
               onClick={() => onChange("")}
             >
-              <Trash2 size={12} /> Hapus
+              <Trash2 size={12} /> Hapus foto
+            </button>
+          )}
+          {changed && persisted && (
+            <button
+              type="button"
+              className="admin-btn admin-btn-sm"
+              onClick={() => onChange(persisted)}
+            >
+              Batalkan foto baru
             </button>
           )}
           {value.startsWith("data:") && (
@@ -221,6 +244,16 @@ export function ImagePicker({
           )}
           <span className="ml-auto text-[0.6rem] text-[var(--muted)]">atau tempel URL ↓</span>
         </div>
+
+        {changed && (
+          <div className="admin-image-status">
+            {!value
+              ? "Foto akan dihapus dari database setelah Anda mengklik Simpan perubahan."
+              : persisted
+                ? "Foto baru belum tersimpan. Klik Simpan perubahan untuk menerapkan. Foto lama akan diganti dan dihapus dari database."
+                : "Foto baru belum tersimpan. Klik Simpan perubahan untuk menyimpannya ke database."}
+          </div>
+        )}
 
         <div className="mt-2 flex items-center gap-1.5">
           <Link2 size={13} className="shrink-0 text-[var(--muted)]" />
@@ -373,6 +406,9 @@ export function useDraft<T>(source: T) {
   const sourceKey = JSON.stringify(source);
   const [draft, setDraft] = useState<T>(source);
   const [baseline, setBaseline] = useState(sourceKey);
+  const dirty = JSON.stringify(draft) !== baseline;
+
+  useAdminDirty(dirty);
 
   useEffect(() => {
     setDraft(source);
@@ -383,7 +419,7 @@ export function useDraft<T>(source: T) {
   return {
     draft,
     setDraft,
-    dirty: JSON.stringify(draft) !== baseline,
+    dirty,
     reset: () => setDraft(source),
   };
 }

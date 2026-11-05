@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -76,4 +77,46 @@ export function useAdminToast() {
   const context = useContext(AdminContext);
   if (!context) throw new Error("useAdminToast must be used inside AdminToastProvider");
   return context;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Unsaved changes guard                                              */
+/* ------------------------------------------------------------------ */
+interface DirtyContextValue {
+  dirty: boolean;
+  setDirty: (value: boolean) => void;
+}
+
+const AdminDirtyContext = createContext<DirtyContextValue | null>(null);
+
+export function AdminDirtyProvider({ children }: { children: ReactNode }) {
+  const [dirty, setDirty] = useState(false);
+  const value = useMemo(() => ({ dirty, setDirty }), [dirty]);
+
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  return <AdminDirtyContext.Provider value={value}>{children}</AdminDirtyContext.Provider>;
+}
+
+/** Register the current form's dirty state so navigation can warn before discarding it. */
+export function useAdminDirty(value: boolean) {
+  const context = useContext(AdminDirtyContext);
+  useEffect(() => {
+    if (!context) return;
+    context.setDirty(value);
+    return () => context.setDirty(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, context?.setDirty]);
+}
+
+export function useAdminDirtyState() {
+  return useContext(AdminDirtyContext)?.dirty ?? false;
 }

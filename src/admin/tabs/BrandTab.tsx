@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSite } from "../../context/SiteContext";
 import { supabase } from "../../lib/supabase";
+import { deleteReplacedImage } from "../../lib/images";
 import { useAdminToast } from "../AdminContext";
 import { Card, Field, ImagePicker, SaveBar, useDraft } from "../ui";
 import type { Settings } from "../../types";
@@ -19,6 +20,7 @@ export function BrandTab() {
   async function save() {
     setSaving(true);
     setError("");
+    const previousLogo = content.settings.logo_url;
     const { error: saveError } = await supabase
       .from("site_settings")
       .upsert({ ...draft, id: 1 });
@@ -28,8 +30,15 @@ export function BrandTab() {
       notify("Gagal menyimpan merek: " + saveError.message, "error");
       return;
     }
+    await deleteReplacedImage(previousLogo, draft.logo_url);
     await refresh();
-    notify("Merek dan logo diperbarui.");
+    notify(
+      draft.logo_url !== previousLogo && draft.logo_url
+        ? "Merek tersimpan. Logo lama sudah diganti dan dihapus dari database."
+        : draft.logo_url !== previousLogo
+          ? "Merek tersimpan. Logo dihapus dari database."
+          : "Merek dan logo diperbarui.",
+    );
   }
 
   return (
@@ -73,6 +82,7 @@ export function BrandTab() {
           </div>
           <ImagePicker
             value={draft.logo_url}
+            savedValue={content.settings.logo_url}
             onChange={(value) => update("logo_url", value)}
             label="File logo"
             maxWidth={512}

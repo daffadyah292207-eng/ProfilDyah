@@ -1,3 +1,5 @@
+import { supabase, SUPABASE_URL } from "./supabase";
+
 export async function fileToDataUrl(
   file: File,
   options: { maxWidth?: number; maxHeight?: number; quality?: number } = {},
@@ -49,4 +51,26 @@ export function formatBytes(value: number) {
 export function dataUrlSize(value: string) {
   const base64 = value.split(",")[1] ?? "";
   return Math.round((base64.length * 3) / 4);
+}
+
+/**
+ * Jika gambar lama tersimpan di Supabase Storage, hapus objeknya setelah gambar
+ * baru berhasil disimpan. Gambar berupa data URL hidup di kolom teks yang sama,
+ * jadi nilai lama otomatis tertimpa (terhapus) saat baris diperbarui.
+ */
+export async function deleteReplacedImage(oldValue: string, newValue: string) {
+  if (!oldValue || oldValue === newValue || !oldValue.startsWith(SUPABASE_URL)) return;
+  const marker = "/storage/v1/object/public/";
+  const index = oldValue.indexOf(marker);
+  if (index === -1) return;
+  const [bucket, ...pathParts] = oldValue
+    .slice(index + marker.length)
+    .split("?")[0]
+    .split("/");
+  if (!bucket || pathParts.length === 0) return;
+  try {
+    await supabase.storage.from(bucket).remove([decodeURIComponent(pathParts.join("/"))]);
+  } catch {
+    // Pembersihan bersifat best-effort; penyimpanan konten tetap berhasil.
+  }
 }

@@ -3,7 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { ArrowLeft, Database, Loader2, LogOut, ShieldAlert, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import { AdminToastProvider, useAdminToast } from "./AdminContext";
+import { AdminToastProvider, AdminDirtyProvider, useAdminToast } from "./AdminContext";
 import { LoginView } from "./LoginView";
 import { AdminShell } from "./AdminShell";
 
@@ -167,7 +167,9 @@ export function AdminApp() {
 
   return (
     <AdminToastProvider>
-      <AdminShell email={session.user.email ?? ""} onSignOut={() => void handleSignOut()} />
+      <AdminDirtyProvider>
+        <AdminShell email={session.user.email ?? ""} onSignOut={() => void handleSignOut()} />
+      </AdminDirtyProvider>
     </AdminToastProvider>
   );
 }

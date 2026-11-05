@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useSite } from "../../context/SiteContext";
 import { supabase } from "../../lib/supabase";
+import { deleteReplacedImage } from "../../lib/images";
 import { useAdminToast } from "../AdminContext";
 import { Card, Field, ImagePicker, LinesEditor, SaveBar, useDraft } from "../ui";
 import type { Profile, StatItem } from "../../types";
@@ -34,6 +35,7 @@ export function ProfileTab() {
   async function save() {
     setSaving(true);
     setError("");
+    const previousPhoto = content.profile.photo_url;
     const { error: saveError } = await supabase
       .from("site_profile")
       .upsert({ ...draft, id: 1 });
@@ -43,8 +45,15 @@ export function ProfileTab() {
       notify("Gagal menyimpan profil: " + saveError.message, "error");
       return;
     }
+    await deleteReplacedImage(previousPhoto, draft.photo_url);
     await refresh();
-    notify("Profil berhasil diperbarui.");
+    notify(
+      draft.photo_url !== previousPhoto && draft.photo_url
+        ? "Profil tersimpan. Foto lama sudah diganti dan dihapus dari database."
+        : draft.photo_url !== previousPhoto
+          ? "Profil tersimpan. Foto profil dihapus dari database."
+          : "Profil berhasil diperbarui.",
+    );
   }
 
   return (
@@ -131,6 +140,7 @@ export function ProfileTab() {
       <Card title="Foto profil" description="Unggah foto potret. Rasio ideal 4:5 (portrait).">
         <ImagePicker
           value={draft.photo_url}
+          savedValue={content.profile.photo_url}
           onChange={(value) => update("photo_url", value)}
           label="Foto hero"
           maxWidth={1100}

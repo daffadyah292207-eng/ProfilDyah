@@ -4,6 +4,7 @@ import { useSite } from "../../context/SiteContext";
 import { useAdminToast } from "../AdminContext";
 import { Card, Field, ImagePicker, LinesEditor, ListControls, SaveBar, useDraft } from "../ui";
 import { newId, persistCollection } from "../collection";
+import { deleteReplacedImage } from "../../lib/images";
 import type { Project } from "../../types";
 
 export function ProjectsTab() {
@@ -47,7 +48,15 @@ export function ProjectsTab() {
     setError("");
     try {
       const normalized = draft.map((item, index) => ({ ...item, sort_order: index + 1 }));
+      const previousImages = new Map(
+        content.projects.map((item) => [item.id, item.image_url] as const),
+      );
       await persistCollection("projects", normalized, content.projects);
+      await Promise.all(
+        normalized.map((item) =>
+          deleteReplacedImage(previousImages.get(item.id) ?? "", item.image_url ?? ""),
+        ),
+      );
       setDraft(normalized);
       await refresh();
       notify("Proyek berhasil disimpan.");
@@ -141,6 +150,7 @@ export function ProjectsTab() {
               <div className="is-full">
                 <ImagePicker
                   value={item.image_url}
+                  savedValue={content.projects.find((entry) => entry.id === item.id)?.image_url ?? ""}
                   onChange={(value) => update(index, { image_url: value })}
                   label="Gambar sampul"
                   maxWidth={1400}

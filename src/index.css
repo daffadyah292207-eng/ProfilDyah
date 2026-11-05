@@ -1682,9 +1682,14 @@ img {
 .admin-main {
   min-width: 0;
   padding: clamp(1.1rem, 3vw, 2.5rem);
+  padding-bottom: clamp(5rem, 10vw, 7rem);
 }
 
 .admin-mobile-bar {
+  display: none !important;
+}
+
+.admin-sidebar-close {
   display: none !important;
 }
 
@@ -1812,6 +1817,48 @@ img {
 .admin-hint {
   font-size: 0.63rem;
   color: var(--muted);
+}
+
+/* Image picker: jelas mana pratinjau lokal dan mana yang sudah tersimpan */
+.admin-image-picker {
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  background: var(--bg);
+  padding: 0.625rem;
+  min-width: 0;
+}
+
+.admin-image-preview {
+  position: relative;
+}
+
+.admin-image-badge {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  z-index: 2;
+  max-width: calc(100% - 0.9rem);
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent);
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  color: var(--accent);
+  font-size: 0.56rem;
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+}
+
+.admin-image-status {
+  margin-top: 0.55rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, transparent);
+  background: var(--accent-soft);
+  color: var(--ink-soft);
+  font-size: 0.63rem;
+  line-height: 1.5;
 }
 
 .admin-btn {
@@ -2274,6 +2321,9 @@ html.dark .admin-note.is-error {
   .admin-mobile-bar {
     display: flex !important;
   }
+  .admin-sidebar-close {
+    display: inline-grid !important;
+  }
   .login-page {
     grid-template-columns: 1fr;
   }
@@ -2283,6 +2333,19 @@ html.dark .admin-note.is-error {
   }
   .login-art .la-title {
     font-size: clamp(2rem, 7vw, 3rem);
+  }
+}
+
+@media (max-width: 860px) {
+  .admin-grid-2,
+  .admin-grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .admin-list-head {
+    flex-wrap: wrap;
+  }
+  .admin-list-head > div:last-child {
+    margin-left: auto;
   }
 }
 
@@ -2349,6 +2412,60 @@ html.dark .admin-note.is-error {
   }
   .admin-savebar {
     bottom: 0.6rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .admin-savebar .admin-toolbar {
+    width: 100%;
+  }
+  .admin-savebar .admin-toolbar .admin-btn {
+    flex: 1;
+  }
+  .login-art {
+    min-height: auto;
+    padding: 1.25rem 1.35rem;
+  }
+  .login-art .my-10 {
+    margin-block: 1.15rem;
+  }
+  .login-art .la-title {
+    font-size: clamp(1.6rem, 7vw, 2.2rem);
+  }
+  .login-art .la-title + p,
+  .login-art > div:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-main {
+    padding-inline: 0.8rem;
+    padding-top: 4.3rem;
+  }
+  .admin-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-topbar .admin-toolbar {
+    width: 100%;
+  }
+  .admin-topbar .admin-toolbar .admin-btn {
+    flex: 1;
+  }
+  .admin-card {
+    padding: 0.85rem;
+    border-radius: 0.95rem;
+  }
+  .admin-card-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-image-badge {
+    white-space: normal;
+  }
+  .admin-list-head {
+    align-items: flex-start;
   }
 }
 
