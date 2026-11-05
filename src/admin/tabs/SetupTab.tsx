@@ -149,8 +149,8 @@ export function SetupTab() {
     },
     {
       done: dbStatus === "ready",
-      title: "Klaim admin & isi konten",
-      text: "Akun pertama yang login dapat mengklaim akses admin, lalu memuat konten contoh ke database.",
+      title: "Akun admin & isi konten",
+      text: "Buat akun dari Supabase Authentication → Users (pendaftaran publik ditutup), lalu klaim admin dan muat konten contoh.",
     },
     {
       done: initialized,
@@ -245,7 +245,7 @@ export function SetupTab() {
               Auth
             </div>
             <div className="mt-0.5 text-[0.66rem]">
-              Email/password aktif · konfirmasi email perlu diverifikasi
+              Hanya masuk · pendaftaran publik ditutup · akun dibuat dari dashboard Supabase
             </div>
           </div>
         </div>
@@ -313,8 +313,13 @@ export function SetupTab() {
           </li>
           <li className="flex gap-2">
             <Check size={13} className="mt-1 shrink-0 text-[var(--accent-2)]" />
-            Jika konfirmasi email aktif, buka tautan di email sebelum masuk. Anda dapat menonaktifkannya
-            di Supabase → Authentication → Providers → Email.
+            Pendaftaran akun ditutup. Buat akun admin dari Supabase → Authentication → Users, lalu
+            masuk lewat halaman login.
+          </li>
+          <li className="flex gap-2">
+            <Check size={13} className="mt-1 shrink-0 text-[var(--accent-2)]" />
+            Pastikan <strong>Allow new users to sign up</strong> dimatikan di Supabase →
+            Authentication → Sign In / Providers → Email.
           </li>
           <li className="flex gap-2">
             <TriangleAlert size={13} className="mt-1 shrink-0 text-[var(--accent)]" />

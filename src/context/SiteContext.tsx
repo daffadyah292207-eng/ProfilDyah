@@ -126,12 +126,12 @@ async function fetchContent(): Promise<{
 
 function accentInk(hex: string) {
   const clean = hex.replace("#", "");
-  if (clean.length !== 6) return "#FFF8F2";
+  if (clean.length !== 6) return "#F6FCFF";
   const r = parseInt(clean.slice(0, 2), 16);
   const g = parseInt(clean.slice(2, 4), 16);
   const b = parseInt(clean.slice(4, 6), 16);
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.62 ? "#14211D" : "#FFF9F3";
+  return luminance > 0.62 ? "#08243A" : "#F6FCFF";
 }
 
 export function SiteProvider({ children }: { children: ReactNode }) {
@@ -170,9 +170,9 @@ export function SiteProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    root.style.setProperty("--accent", settings.accent || "#C85834");
-    root.style.setProperty("--accent-2", settings.accent_secondary || "#2F6B5A");
-    root.style.setProperty("--accent-ink", accentInk(settings.accent || "#C85834"));
+    root.style.setProperty("--accent-base", settings.accent || "#0B6E99");
+    root.style.setProperty("--accent-2-base", settings.accent_secondary || "#2C9BCB");
+    root.style.setProperty("--accent-ink", accentInk(settings.accent || "#0B6E99"));
     root.dataset.font = settings.font_style || "editorial";
     root.dataset.grain = settings.grain ? "on" : "off";
     const stored = localStorage.getItem("dyah-theme");
@@ -180,7 +180,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     setMode(preferred as ThemeMode);
     document.querySelector('meta[name="theme-color"]')?.setAttribute(
       "content",
-      preferred === "dark" ? "#0F1916" : "#F6F1E7",
+      preferred === "dark" ? "#061826" : "#F2F8FD",
     );
   }, [settings.accent, settings.accent_secondary, settings.font_style, settings.grain, settings.theme_mode]);
 
@@ -190,7 +190,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     root.style.colorScheme = mode;
     document
       .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", mode === "dark" ? "#0F1916" : "#F6F1E7");
+      ?.setAttribute("content", mode === "dark" ? "#061826" : "#F2F8FD");
   }, [mode]);
 
   const toggleMode = useCallback(() => {

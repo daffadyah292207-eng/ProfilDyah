@@ -7,23 +7,35 @@ import { Card, ColorField, Field, SaveBar, Toggle, useDraft } from "../ui";
 import type { FontStyle, Settings, ThemeMode } from "../../types";
 
 const presets = [
-  { name: "Terracotta", accent: "#C85834", secondary: "#2F6B5A" },
-  { name: "Hutan", accent: "#3D7A5F", secondary: "#A56C3D" },
-  { name: "Samudra", accent: "#3D6F8E", secondary: "#C27A4A" },
-  { name: "Mawar", accent: "#B85C6B", secondary: "#4F6B5E" },
-  { name: "Senja", accent: "#9A5B3C", secondary: "#6B5B8E" },
+  { name: "Samudra", accent: "#0B6E99", secondary: "#2C9BCB" },
+  { name: "Langit", accent: "#1D7FB8", secondary: "#6CC7EE" },
+  { name: "Nautika", accent: "#0A5C7A", secondary: "#2FA8C9" },
+  { name: "Fajar", accent: "#2A6F97", secondary: "#89C2D9" },
+  { name: "Malam", accent: "#1E3A5F", secondary: "#4B9CD3" },
 ];
 
-const fontLabels: Record<FontStyle, string> = {
-  editorial: "Editorial — Fraunces + Manrope",
-  modern: "Modern — Sora + Manrope",
-  classic: "Klasik — Playfair Display + DM Sans",
-};
-
-const fontStacks: Record<FontStyle, string> = {
-  editorial: '"Fraunces", Georgia, serif',
-  modern: '"Sora", sans-serif',
-  classic: '"Playfair Display", Georgia, serif',
+const fontOptions: Record<
+  FontStyle,
+  { label: string; note: string; heading: string; body: string }
+> = {
+  editorial: {
+    label: "Samudra",
+    note: "Plus Jakarta Sans + DM Sans",
+    heading: '"Plus Jakarta Sans", sans-serif',
+    body: '"DM Sans", sans-serif',
+  },
+  modern: {
+    label: "Neo",
+    note: "Sora + Manrope",
+    heading: '"Sora", sans-serif',
+    body: '"Manrope", sans-serif',
+  },
+  classic: {
+    label: "Klasik",
+    note: "Playfair Display + DM Sans",
+    heading: '"Playfair Display", Georgia, serif',
+    body: '"DM Sans", sans-serif',
+  },
 };
 
 export function AppearanceTab() {
@@ -54,11 +66,17 @@ export function AppearanceTab() {
   }
 
   const previewStyle = {
-    background: draft.theme_mode === "dark" ? "#0e1714" : "#f5f0e6",
-    color: draft.theme_mode === "dark" ? "#f4efe5" : "#14211d",
+    background: draft.theme_mode === "dark" ? "#061826" : "#f2f8fd",
+    color: draft.theme_mode === "dark" ? "#eaf6fd" : "#08243a",
     ["--preview-accent" as string]: draft.accent,
     ["--preview-secondary" as string]: draft.accent_secondary,
   } as CSSProperties;
+  const activeFont = fontOptions[draft.font_style];
+  const previewAccent =
+    draft.theme_mode === "dark"
+      ? `color-mix(in srgb, ${draft.accent} 58%, #c9efff)`
+      : draft.accent;
+  const previewAccentInk = draft.theme_mode === "dark" ? "#04111c" : "#f6fcff";
 
   return (
     <div>
@@ -82,19 +100,45 @@ export function AppearanceTab() {
             </div>
           </Field>
           <Field label="Pasangan font">
-            <select
-              className="admin-select"
-              value={draft.font_style}
-              onChange={(event) => update("font_style", event.target.value as FontStyle)}
-            >
-              {(Object.keys(fontLabels) as FontStyle[]).map((value) => (
-                <option key={value} value={value}>
-                  {fontLabels[value]}
-                </option>
-              ))}
-            </select>
+            <div className="grid gap-1.5">
+              {(Object.keys(fontOptions) as FontStyle[]).map((value) => {
+                const option = fontOptions[value];
+                const active = draft.font_style === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => update("font_style", value)}
+                    className={`flex items-center gap-3 rounded-[0.7rem] border px-2.5 py-2 text-left transition-colors ${
+                      active
+                        ? "border-[var(--accent)] bg-[var(--accent-soft)]"
+                        : "border-[var(--line)] hover:border-[var(--line-strong)]"
+                    }`}
+                  >
+                    <span
+                      className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[var(--surface)] text-[1.1rem] font-semibold leading-none"
+                      style={{ fontFamily: option.heading }}
+                    >
+                      Aa
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[0.72rem] font-extrabold">{option.label}</span>
+                      <span className="block truncate text-[0.6rem] text-[var(--muted)]">
+                        {option.note}
+                      </span>
+                    </span>
+                    {active && <Check size={12} className="shrink-0 text-[var(--accent)]" />}
+                  </button>
+                );
+              })}
+            </div>
           </Field>
         </div>
+
+        <p className="mt-2 text-[0.64rem] leading-relaxed text-[var(--muted)]">
+          Font dipakai untuk judul dan teks isi situs, tersimpan ke database, dan langsung berlaku
+          untuk semua pengunjung.
+        </p>
 
         <div className="mt-4">
           <span className="admin-label">Preset warna</span>
@@ -165,26 +209,30 @@ export function AppearanceTab() {
             </span>
             <span
               className="rounded-full px-2.5 py-1 text-[0.55rem] font-bold uppercase tracking-[0.1em]"
-              style={{ background: draft.accent, color: "#fff9f3" }}
+              style={{ background: previewAccent, color: previewAccentInk }}
             >
               Preview
             </span>
           </div>
           <div
             className="mt-6 text-[clamp(1.8rem,4vw,2.8rem)] leading-[1.02] tracking-[-0.04em]"
-            style={{ fontFamily: fontStacks[draft.font_style] }}
+            style={{ fontFamily: activeFont.heading, fontWeight: 650 }}
           >
-            Mengembalikan <em style={{ color: draft.accent }}>gerak,</em>
+            Mengembalikan{" "}
+            <em style={{ color: previewAccent, fontStyle: "italic" }}>gerak,</em>
             <br />
             merawat hidup.
           </div>
-          <p className="mt-3 max-w-md text-[0.75rem] leading-relaxed opacity-65">
+          <p
+            className="mt-3 max-w-md text-[0.75rem] leading-relaxed opacity-65"
+            style={{ fontFamily: activeFont.body }}
+          >
             {draft.hero_description}
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <span
               className="rounded-full px-3 py-1.5 text-[0.65rem] font-bold"
-              style={{ background: draft.accent, color: "#fff9f3" }}
+              style={{ background: previewAccent, color: previewAccentInk }}
             >
               {draft.cta_primary || "Kenali saya"}
             </span>

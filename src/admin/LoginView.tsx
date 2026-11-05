@@ -1,11 +1,19 @@
-import { ArrowLeft, ArrowRight, Loader2, LockKeyhole, Mail, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ExternalLink,
+  Loader2,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+} from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useSite } from "../context/SiteContext";
 import { Logo } from "../components/Logo";
 
-type Mode = "login" | "signup" | "reset";
+type Mode = "login" | "reset";
 
 export function LoginView() {
   const { content } = useSite();
@@ -16,6 +24,12 @@ export function LoginView() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  function switchMode(next: Mode) {
+    setMode(next);
+    setError("");
+    setMessage("");
+  }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -31,26 +45,6 @@ export function LoginView() {
         });
         if (resetError) throw resetError;
         setMessage("Tautan reset password sudah dikirim. Periksa email Anda.");
-        return;
-      }
-
-      if (mode === "signup") {
-        if (password.length < 8) {
-          throw new Error("Password minimal 8 karakter.");
-        }
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-        });
-        if (signUpError) throw signUpError;
-        if (data.session) {
-          setMessage("Akun dibuat. Anda sudah masuk.");
-        } else {
-          setMessage(
-            "Akun dibuat. Cek email untuk konfirmasi, lalu masuk kembali. (Jika konfirmasi email dimatikan, Anda bisa langsung masuk.)",
-          );
-          setMode("login");
-        }
         return;
       }
 
@@ -112,43 +106,14 @@ export function LoginView() {
               <LockKeyhole size={11} /> Akses terbatas
             </div>
             <h2 className="h2 !text-[2rem]">
-              {mode === "signup" ? "Buat akun admin" : mode === "reset" ? "Atur ulang password" : "Selamat datang kembali"}
+              {mode === "reset" ? "Atur ulang password" : "Selamat datang kembali"}
             </h2>
             <p className="mt-2 text-[0.76rem] leading-relaxed text-[var(--muted)]">
-              {mode === "signup"
-                ? "Gunakan email aktif. Admin pertama akan mengklaim akses setelah email dikonfirmasi."
-                : mode === "reset"
-                  ? "Masukkan email akun Anda untuk menerima tautan reset."
-                  : "Masuk untuk mengelola isi dan tampilan website profil."}
+              {mode === "reset"
+                ? "Masukkan email akun admin untuk menerima tautan reset password."
+                : "Masuk untuk mengelola isi dan tampilan website profil."}
             </p>
           </div>
-
-          {mode !== "reset" && (
-            <div className="auth-tabs" role="tablist">
-              <button
-                type="button"
-                className={`auth-tab ${mode === "login" ? "is-active" : ""}`}
-                onClick={() => {
-                  setMode("login");
-                  setError("");
-                  setMessage("");
-                }}
-              >
-                Masuk
-              </button>
-              <button
-                type="button"
-                className={`auth-tab ${mode === "signup" ? "is-active" : ""}`}
-                onClick={() => {
-                  setMode("signup");
-                  setError("");
-                  setMessage("");
-                }}
-              >
-                Daftar
-              </button>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="grid gap-3">
             <label className="admin-field">
@@ -180,12 +145,9 @@ export function LoginView() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                    autoComplete="current-password"
                   />
                 </div>
-                {mode === "signup" && (
-                  <span className="admin-hint">Minimal 8 karakter.</span>
-                )}
               </label>
             )}
 
@@ -194,7 +156,7 @@ export function LoginView() {
 
             <button type="submit" className="btn btn-primary mt-1 w-full" disabled={busy}>
               {busy ? <Loader2 size={15} className="animate-spin" /> : null}
-              {mode === "signup" ? "Buat akun" : mode === "reset" ? "Kirim tautan" : "Masuk ke dashboard"}
+              {mode === "reset" ? "Kirim tautan" : "Masuk ke dashboard"}
               {!busy && <ArrowRight size={15} />}
             </button>
           </form>
@@ -204,11 +166,7 @@ export function LoginView() {
               <button
                 type="button"
                 className="font-semibold text-[var(--muted)] hover:text-[var(--accent)]"
-                onClick={() => {
-                  setMode("reset");
-                  setError("");
-                  setMessage("");
-                }}
+                onClick={() => switchMode("reset")}
               >
                 Lupa password?
               </button>
@@ -216,11 +174,7 @@ export function LoginView() {
               <button
                 type="button"
                 className="font-semibold text-[var(--muted)] hover:text-[var(--accent)]"
-                onClick={() => {
-                  setMode("login");
-                  setError("");
-                  setMessage("");
-                }}
+                onClick={() => switchMode("login")}
               >
                 Kembali ke halaman masuk
               </button>
@@ -230,10 +184,23 @@ export function LoginView() {
             </Link>
           </div>
 
-          <p className="mt-6 border-t border-[var(--line)] pt-4 text-[0.62rem] leading-relaxed text-[var(--muted)]">
+          <div className="mt-5 rounded-[0.8rem] border border-[var(--line)] bg-[var(--surface-2)] p-3.5 text-[0.65rem] leading-relaxed text-[var(--muted)]">
+            <strong className="text-[var(--ink)]">Pendaftaran akun ditutup.</strong> Hanya akun admin
+            yang dapat masuk. Untuk membuat akun admin pertama, buat pengguna melalui Supabase
+            Dashboard → Authentication → Users.
+            <a
+              href="https://supabase.com/dashboard/project/irnxgpyvuugipxswbtmf/auth/users"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mt-1.5 flex w-fit items-center gap-1 font-bold text-[var(--accent)]"
+            >
+              Buka pengguna Supabase <ExternalLink size={11} />
+            </a>
+          </div>
+
+          <p className="mt-4 border-t border-[var(--line)] pt-4 text-[0.62rem] leading-relaxed text-[var(--muted)]">
             Dashboard ini menggunakan Supabase Auth. Hanya akun yang terdaftar sebagai admin yang
-            dapat mengubah konten. Akun pertama dapat mengklaim akses admin setelah database
-            disiapkan.
+            dapat mengubah konten.
           </p>
         </div>
       </div>

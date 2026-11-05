@@ -4,10 +4,10 @@ import { Reveal } from "../Reveal";
 import { isExternal, normalizeUrl } from "../../lib/utils";
 
 const gradients = [
-  "linear-gradient(135deg, #2F6B5A 0%, #16382F 100%)",
-  "linear-gradient(135deg, #C85834 0%, #7E2F20 100%)",
-  "linear-gradient(135deg, #4E6E81 0%, #22333D 100%)",
-  "linear-gradient(135deg, #8A6A4A 0%, #3B2C1F 100%)",
+  "linear-gradient(135deg, #0B6E99 0%, #063C59 100%)",
+  "linear-gradient(135deg, #2C9BCB 0%, #0B5478 100%)",
+  "linear-gradient(135deg, #1E5F8A 0%, #082A43 100%)",
+  "linear-gradient(135deg, #3A8FB7 0%, #0B3B5A 100%)",
 ];
 
 export function Projects() {

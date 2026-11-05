@@ -112,9 +112,9 @@ export function SetupPage() {
           {[
             "Buka Supabase Dashboard → SQL Editor.",
             "Tempel seluruh skrip di bawah (atau unduh lalu buka filenya), lalu klik Run.",
-            "Kembali ke halaman ini, klik Cek koneksi, lalu masuk ke dashboard.",
-            "Login atau daftar dengan email. Akun pertama dapat mengklaim akses admin.",
-            "Di dashboard, buka Database & Setup dan klik Muat konten contoh.",
+            "Kembali ke halaman ini, klik Cek koneksi untuk memastikan tabel terbaca.",
+            "Buat akun admin di Supabase Dashboard → Authentication → Users → Add user. Pendaftaran publik sudah ditutup.",
+            "Masuk ke dashboard, klaim akses admin, lalu buka Database & Setup dan klik Muat konten contoh.",
           ].map((step, index) => (
             <li key={step} className="flex gap-3 rounded-[0.9rem] border border-[var(--line)] bg-[var(--surface)] p-3.5">
               <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--accent-soft)] text-[0.65rem] font-extrabold text-[var(--accent)]">
@@ -133,6 +133,14 @@ export function SetupPage() {
             className="btn btn-accent btn-sm"
           >
             Buka SQL Editor <ExternalLink size={13} />
+          </a>
+          <a
+            href="https://supabase.com/dashboard/project/irnxgpyvuugipxswbtmf/auth/users"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="btn btn-ghost btn-sm"
+          >
+            Kelola akun admin <ExternalLink size={13} />
           </a>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => void copy()}>
             {copied ? <Check size={13} /> : <Clipboard size={13} />}
@@ -158,7 +166,7 @@ export function SetupPage() {
             </span>
             <span className="text-[0.6rem] text-[var(--muted)]">{schemaSql.split("\n").length} baris</span>
           </div>
-          <pre className="max-h-[32rem] overflow-auto bg-[#10201b] p-4 font-mono text-[0.68rem] leading-relaxed text-[#d7e8dd]">
+          <pre className="max-h-[32rem] overflow-auto bg-[#041d2f] p-4 font-mono text-[0.68rem] leading-relaxed text-[#d7effa]">
             {schemaSql}
           </pre>
         </div>
@@ -168,6 +176,13 @@ export function SetupPage() {
           Skema memakai Row Level Security: publik hanya dapat membaca konten dan mengirim pesan.
           Hanya admin terautentikasi yang dapat menulis. Publishable key aman dipakai di browser;
           jangan pernah memakai service_role key di frontend.
+        </div>
+
+        <div className="admin-note is-warn mt-3">
+          <ShieldCheck size={14} className="mr-1 inline" />
+          Agar tidak ada yang bisa mendaftar, matikan <strong>Allow new users to sign up</strong> di
+          Supabase → Authentication → Sign In / Providers → Email. Halaman admin hanya menampilkan
+          form masuk.
         </div>
       </main>
     </div>

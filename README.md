@@ -59,18 +59,23 @@ Karena publishable key tidak dapat menjalankan DDL, skema harus dijalankan dari 
 1. Buka [Supabase SQL Editor](https://supabase.com/dashboard/project/irnxgpyvuugipxswbtmf/sql/new).
 2. Salin seluruh isi [`supabase/schema.sql`](supabase/schema.sql), tempel, lalu **Run**.
 3. Buka `/setup` di aplikasi untuk memandu langkah ini (ada tombol salin/unduh).
-4. Masuk ke `/admin`, daftar akun, konfirmasi email, lalu klik **Klaim sebagai admin**.
-5. Di **Database & Setup**, klik **Muat konten contoh**.
+4. Buat akun admin dari **Supabase → Authentication → Users → Add user**. Pendaftaran publik
+   ditutup, jadi halaman `/admin` hanya menampilkan form masuk.
+5. Masuk ke `/admin`, klik **Klaim sebagai admin**, lalu di **Database & Setup** klik
+   **Muat konten contoh**.
 
 Skema membuat 9 tabel (`site_profile`, `site_settings`, `skills`, `experiences`, `projects`,
 `certifications`, `social_links`, `messages`, `site_admins`), RLS, trigger `updated_at`, dan fungsi
 `is_site_admin()` + `claim_site_admin()`.
 
-### Konfirmasi email
+### Akun admin & pendaftaran
 
-Secara default Supabase meminta konfirmasi email. Setelah daftar, buka tautan konfirmasi di email
-sebelum login. Untuk pengembangan cepat, nonaktifkan sementara di
-**Authentication → Providers → Email → Confirm email**.
+Halaman admin tidak menyediakan pendaftaran. Buat akun dari
+**Supabase → Authentication → Users → Add user**, lalu masuk lewat `/admin`.
+
+Matikan **Authentication → Sign In / Providers → Email → Allow new users to sign up** agar tidak
+ada yang bisa mendaftar lewat API. Jika konfirmasi email masih aktif, konfirmasi akun terlebih
+dahulu atau nonaktifkan **Confirm email** saat membuat akun pertama.
 
 ## Deploy ke GitHub Pages
 
@@ -83,6 +88,12 @@ Workflow `.github/workflows/deploy.yml` sudah disiapkan:
 
 Workflow memakai `VITE_BASE=/ProfilDyah/` agar aset dan routing cocok dengan subpath repo.
 `public/404.html` menangani deep link seperti `/admin` pada GitHub Pages.
+
+## Deploy ke Vercel
+
+Repo sudah menyertakan `vercel.json` dengan rewrite SPA, sehingga `/admin` dan `/setup` dapat
+dibuka langsung tanpa 404. Import repo di Vercel; framework terdeteksi sebagai Vite, build
+`npm run build`, output `dist`. Tidak perlu mengatur `VITE_BASE` (default `/`).
 
 ## Struktur
 
@@ -105,7 +116,8 @@ public/404.html     SPA fallback GitHub Pages
 - `site_admins` hanya dapat dibaca oleh admin terkait.
 - Fungsi `claim_site_admin()` hanya berfungsi saat belum ada admin sama sekali.
 - Pesan kontak dapat dibaca/diubah/dihapus hanya oleh admin.
-- Untuk menambah admin lain, daftarkan akun lalu insert barisnya melalui Supabase SQL Editor:
+- Untuk menambah admin lain, buat akun dari Supabase Authentication lalu insert barisnya melalui
+  SQL Editor:
 
 ```sql
 insert into public.site_admins (user_id, email)
