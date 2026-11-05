@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // GitHub Pages SPA fallback: restore the path after 404.html redirects.
+      (function (location) {
+        if (location.search[1] === "/") {
+          var decoded = location.search
+            .slice(1)
+            .split("&")
+            .map(function (s) {
+              return s.replace(/~and~/g, "&");
+            })
+            .join("?");
+          window.history.replaceState(
+            null,
+            null,
+            location.pathname.slice(0, -1) + decoded + location.hash,
+          );
+        }
+      })(window.location);
+    </script>
+    <meta name="theme-color" content="#F6F1E7" />
+    <meta
+      name="description"
+      content="Portofolio Dyah — mahasiswa Fisioterapi. Rehabilitasi muskuloskeletal, terapi manual, latihan terapeutik, dan edukasi pasien."
+    />
+    <meta property="og:title" content="Dyah — Mahasiswa Fisioterapi" />
+    <meta
+      property="og:description"
+      content="Mengembalikan gerak, merawat kualitas hidup. Portofolio, keahlian, dan perjalanan belajar di bidang fisioterapi."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Manrope:wght@300..800&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Sora:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>Dyah — Mahasiswa Fisioterapi</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
